@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import parse from "html-react-parser";
-
+import "./BusquedaSimple.css"; // <-- ¡IMPORTA TU NUEVO CSS!
 
 async function searchQuery(query) {
   const result = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`);
@@ -54,7 +54,6 @@ function BusquedaSimple() {
   useEffect(() => {
     if (terminoDebounced) {
       searchQuery(terminoDebounced).then((data) => {
-        // <-- ¡Usa 'terminoDebounced'!
         setResultados(data);
       });
     }
@@ -74,7 +73,6 @@ function BusquedaSimple() {
   };
 
   const quitarDeFavoritos = (event, serieParaQuitar) => {
-    // Detenemos el click para evitar que se abra el detalle (lo usaremos luego)
     event.stopPropagation();
 
     const nuevosFavoritos = seriesFavoritas.filter(
@@ -86,35 +84,37 @@ function BusquedaSimple() {
   return (
     <div className="busqueda-container">
       {serieElegida === null ? (
-        <div>
+        <div className="vista-busqueda">
           <h2>🔍 Encuentra tu serie favorita</h2>
 
           {/* ====== SECCIÓN DE FAVORITOS ====== */}
-          <div className="favoritos-seccion" style={{ marginBottom: "30px" }}>
+          <div className="favoritos-seccion">
             <h3>⭐ Mis Series Favoritas</h3>
             {seriesFavoritas.length === 0 ? (
-              <p>No has guardado ninguna serie todavía.</p>
+              <p className="estado-vacio">
+                No has guardado ninguna serie todavía.
+              </p>
             ) : (
-              <ul className="list-none grid grid-cols-5 gap-2">
-                {" "}
-                {/* Un grid de 5 columnas */}
+              <ul className="lista-series favoritos-grid">
                 {seriesFavoritas.map((fav) => (
                   <li
-                    key={fav.show.id} // <-- Clave correcta
-                    onClick={() => setSerieElegida(fav)} // <-- Abre el detalle
-                    className="block border cursor-pointer relative" // <-- 'relative' para el botón
+                    key={fav.show.id}
+                    onClick={() => setSerieElegida(fav)}
+                    className="serie-card favorito-card"
                   >
                     {/* Botón para quitar */}
                     <button
                       onClick={(e) => quitarDeFavoritos(e, fav)}
-                      className="absolute top-0 right-0 bg-red-600 text-white p-1"
+                      className="btn-quitar-fav"
                       title="Quitar de favoritos"
                     >
-                      X
+                      &times; {/* Un 'X' más elegante */}
                     </button>
 
-                    {fav.show.image && <img src={fav.show.image.medium} />}
-                    <p className="p-2">{fav.show.name}</p>
+                    {fav.show.image && (
+                      <img src={fav.show.image.medium} alt={fav.show.name} />
+                    )}
+                    <p>{fav.show.name}</p>
                   </li>
                 ))}
               </ul>
@@ -126,26 +126,27 @@ function BusquedaSimple() {
             type="text"
             placeholder="Escribe tu término de búsqueda..."
             value={terminoBusqueda}
-            onChange={manejarCambio} // Llama a la función al escribir
-            style={{ padding: "10px", width: "300px", marginBottom: "20px" }}
+            onChange={manejarCambio}
+            className="input-busqueda"
           />
 
           {/* Resultados */}
           <h3>Resultados: ({resultados.length})</h3>
-          {resultados.length === 0 ? (
-            <p>No se encontraron resultados para "{terminoBusqueda}".</p>
+          {resultados.length === 0 && terminoBusqueda ? (
+            <p className="estado-vacio">
+              No se encontraron resultados para "{terminoBusqueda}".
+            </p>
           ) : (
-            <ul className="list-none grid grid-cols-3">
-              {/* Mapea y muestra cada resultado */}
+            <ul className="lista-series resultados-grid">
               {resultados.map((item) => (
                 <li
                   key={item.show.id}
                   onClick={() => setSerieElegida(item)}
-                  className="block border cursor-pointer"
+                  className="serie-card resultado-card"
                 >
-                  <p>
-                    {item.show.image && <img src={item.show.image.medium} />}
-                  </p>
+                  {item.show.image && (
+                    <img src={item.show.image.original} alt={item.show.name} />
+                  )}
                   <p>{item.show.name}</p>
                 </li>
               ))}
@@ -153,32 +154,34 @@ function BusquedaSimple() {
           )}
         </div>
       ) : (
-        <div>
+        <div className="vista-detalle">
           {(() => {
             const yaEsFavorita = seriesFavoritas.some(
               (fav) => fav.show.id === serieElegida.show.id
             );
 
             return (
-              <div className="flex bg-gray-100 p-4 justify-center gap-4">
+              <div className="detalle-controles">
                 <button
                   onClick={() => {
                     setSerieElegida(null);
                   }}
+                  className="btn-detalle btn-cerrar-detalle"
+                  title="Cerrar vista de detalle"
                 >
-                  X
+                  &times; Volver a la búsqueda
                 </button>
                 {yaEsFavorita ? (
                   <button
                     onClick={(e) => quitarDeFavoritos(e, serieElegida)}
-                    className="bg-red-500 text-white p-2"
+                    className="btn-detalle btn-accion btn-quitar"
                   >
                     Quitar de Favoritos
                   </button>
                 ) : (
                   <button
                     onClick={() => guardarEnFavoritos(serieElegida)}
-                    className="bg-blue-500 text-white p-2"
+                    className="btn-detalle btn-accion btn-guardar"
                   >
                     Guardar en Favoritos
                   </button>
@@ -187,38 +190,55 @@ function BusquedaSimple() {
             );
           })()}
 
-          <h2>{serieElegida.show.name}</h2>
-          {serieElegida.show.image && (
-            <img src={serieElegida.show.image.medium} alt="Title image" />
-          )}
-          <div>
-            <strong>Genero:</strong> {serieElegida.show.genres.join(", ")}
+          {/* Contenido del detalle estructurado para layout responsivo */}
+          <div className="detalle-contenido">
+            <div className="detalle-col-izquierda">
+              {serieElegida.show.image && (
+                <img
+                  src={serieElegida.show.image.original}
+                  alt={serieElegida.show.name}
+                />
+              )}
+            </div>
+
+            <div className="detalle-col-derecha">
+              <h2>{serieElegida.show.name}</h2>
+              <div className="detalle-info">
+                <div>
+                  <strong>Genero:</strong>{" "}
+                  {serieElegida.show.genres.join(", ") || "N/A"}
+                </div>
+                <div>
+                  <strong>Estado:</strong> {serieElegida.show.status || "N/A"}
+                </div>
+                <div>
+                  <strong>Duracion promedia:</strong>{" "}
+                  {serieElegida.show.averageRuntime
+                    ? `${serieElegida.show.averageRuntime} min`
+                    : "N/A"}
+                </div>
+                <div>
+                  <strong>Estrenado:</strong>{" "}
+                  {serieElegida.show.premiered || "N/A"}
+                </div>
+                <div>
+                  <strong>Termino:</strong> {serieElegida.show.ended || "N/A"}
+                </div>
+                <div>
+                  <strong>Rating:</strong>{" "}
+                  {serieElegida.show.rating?.average || "N/A"}
+                </div>
+              </div>
+
+              {serieElegida.show.summary ? (
+                <div className="detalle-summary">
+                  {parse(serieElegida.show.summary)}
+                </div>
+              ) : (
+                <p>No hay resumen disponible</p>
+              )}
+            </div>
           </div>
-          <div>
-            <strong>Estado:</strong> {serieElegida.show.status}
-          </div>
-          <div>
-            <strong>Duracion promedia:</strong>{" "}
-            {serieElegida.show.averageRuntime || "N/A"}
-          </div>
-          <div>
-            <strong>Estrenado:</strong> {serieElegida.show.premiered || "N/A"}
-          </div>
-          <div>
-            <strong>Termino:</strong> {serieElegida.show.ended || "N/A"}
-          </div>
-          <div>
-            <strong>Rating:</strong>{" "}
-            {serieElegida.show.rating?.average || "N/A"}
-          </div>
-          {/* <div
-            dangerouslySetInnerHTML={{ __html: serieElegida.show.summary }}
-          /> */}
-          {serieElegida.show.summary ? (
-            <div>{parse(serieElegida.show.summary)}</div>
-          ) : (
-            <p>No hay resumen disponible</p>
-          )}
         </div>
       )}
     </div>

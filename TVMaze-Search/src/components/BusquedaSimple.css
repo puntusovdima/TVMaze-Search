@@ -1,0 +1,322 @@
+/* === TEMA OSCURO Y ESTILOS BASE === */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: #121212; /* Fondo oscuro principal */
+  color: #e0e0e0; /* Texto claro */
+  margin: 0;
+  padding: 0;
+}
+
+/* Oculta el scroll del body cuando el modal está abierto */
+body.modal-abierto {
+  overflow: hidden;
+}
+
+.busqueda-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h2,
+h3 {
+  color: #ffffff;
+  border-bottom: 2px solid #333;
+  padding-bottom: 8px;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+}
+h3 {
+  font-size: 1.4rem;
+}
+
+p.estado-vacio {
+  background-color: #222;
+  border: 1px dashed #444;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: #999;
+}
+
+/* === SECCIÓN DE BÚSQUEDA === */
+
+.input-busqueda {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 1px solid #444;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+.input-busqueda:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* === LISTAS DE SERIES (FAVORITOS Y RESULTADOS) === */
+
+.lista-series {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1.2rem; /* Un poco más de espacio */
+}
+
+/* Móvil: 2 columnas para favs, 1 para resultados */
+.favoritos-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+.resultados-grid {
+  grid-template-columns: 1fr;
+}
+
+/* === TARJETA DE SERIE (SERIE-CARD) === */
+
+.serie-card {
+  background: #2a2a2a; /* Fondo de tarjeta oscuro */
+  border: 1px solid #333; /* Borde sutil */
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  overflow: hidden;
+  position: relative;
+  display: flex; /* Usamos flex para alinear contenido */
+  flex-direction: column; /* Apila imagen y texto */
+}
+
+.serie-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  border-color: #444;
+}
+
+.serie-card p {
+  padding: 1rem;
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Asegura que ocupe el espacio restante */
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botón de quitar en favoritos */
+.btn-quitar-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1.2rem; /* Ligeramente más grande */
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  z-index: 10;
+
+  /* La clave para el centrado perfecto */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-quitar-fav:hover {
+  background-color: #c0392b;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* === VISTA de DETALLE (MODAL PANTALLA COMPLETA) === */
+
+.vista-detalle {
+  width: 100%;
+  height: 100%;
+  padding: 1em;
+  background-color: #1a1a1a; /* Fondo oscuro ligeramente diferente */
+  z-index: 1000;
+  overflow-y: auto; /* Permite scroll SÓLO en el modal */
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.detalle-controles {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Estilo base para botones de detalle */
+.btn-detalle {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.btn-cerrar-detalle {
+  background-color: #555;
+  color: #fff;
+  margin-right: auto; /* Empuja los otros botones a la derecha */
+}
+.btn-cerrar-detalle:hover {
+  background-color: #777;
+}
+
+.btn-accion.btn-guardar {
+  background-color: #3498db;
+  color: white;
+}
+.btn-accion.btn-guardar:hover {
+  background-color: #2980b9;
+}
+
+.btn-accion.btn-quitar {
+  background-color: #e74c3c;
+  color: white;
+}
+.btn-accion.btn-quitar:hover {
+  background-color: #c0392b;
+}
+
+/* Layout del contenido del detalle */
+.detalle-contenido {
+  display: flex;
+  flex-direction: column; /* Apilado en móvil */
+  gap: 1.5rem;
+}
+
+.detalle-col-izquierda img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  display: block;
+  margin: 0 auto;
+}
+
+.detalle-col-derecha h2 {
+  margin-top: 0;
+  font-size: 2.2rem;
+  color: #fff;
+}
+
+.detalle-info div {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.detalle-info strong {
+  color: #ffffff;
+  margin-right: 8px;
+}
+
+.detalle-summary {
+  margin-top: 1.5rem;
+  line-height: 1.6;
+  color: #ccc;
+}
+.detalle-summary p {
+  margin-bottom: 1em;
+}
+.detalle-summary b,
+.detalle-summary strong {
+  color: #fff;
+}
+.detalle-summary i {
+  font-style: italic;
+}
+.detalle-summary a {
+  color: #3498db;
+  text-decoration: underline;
+}
+.detalle-summary a:hover {
+  color: #5dade2;
+}
+
+/* === QUERIES RESPONSIVAS (Mobile-first) === */
+
+/* Tablet */
+@media (min-width: 600px) {
+  .favoritos-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .resultados-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Escritorio */
+@media (min-width: 900px) {
+  .favoritos-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .resultados-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .detalle-contenido {
+    flex-direction: row; /* Lado a lado */
+  }
+  .detalle-col-izquierda {
+    flex-shrink: 0;
+    width: 300px;
+  }
+  .detalle-col-izquierda img {
+    margin: 0;
+  }
+  .detalle-col-derecha {
+    flex-grow: 1;
+  }
+}
+
+/* Escritorio con pantalla grande */
+@media (min-width: 1300px) {
+    .favoritos-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .resultados-grid{
+        grid-template-columns: repeat(5, 1fr);
+    }
+    
+}
