@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import parse from 'html-react-parser';
 
 // const datosEjemplo = [
 //   { id: 1, titulo: "Introducción a React" },
@@ -35,7 +36,6 @@ function BusquedaSimple() {
 
   return (
     <div className="busqueda-container">
-
       {serieElegida === null ? (
         <div>
           <h2>🔍 Página de Búsqueda Simple</h2>
@@ -70,21 +70,34 @@ function BusquedaSimple() {
         </div>
       ) : (
         <div>
+          <button
+            onClick={() => {
+              setSerieElegida(null);
+            }}
+          >
+            X
+          </button>
           <h2>{serieElegida.show.name}</h2>
-          <div>Genero: {
-            <>
-            {serieElegida.show.genres.map((genero) => (
-              <p>, {genero}</p>
-            ))}
-            </>
+          <div>
+            Genero:{" "}
+            {
+              // <>
+              // {serieElegida.show.genres.map((genero) => (
+              //   <p>, {genero}</p>
+              // ))}
+              // </>
+              serieElegida.show.genres.join(", ")
             }
-            </div>
-            <div>Estado: {serieElegida.show.status}</div>
-            <div>Tiempo promedio: {serieElegida.show.averageRuntime}</div>
-            <div>Estrenado: {serieElegida.show.premiered}</div>
-            <div>Termino: {serieElegida.show.ended}</div>
-            <div>Rating: {serieElegida.show.rating.average}</div>
-            {serieElegida.show.summary}
+          </div>
+          <div>Estado: {serieElegida.show.status}</div>
+          <div>Tiempo promedio: {serieElegida.show.averageRuntime}</div>
+          <div>Estrenado: {serieElegida.show.premiered}</div>
+          <div>Termino: {serieElegida.show.ended}</div>
+          <div>Rating: {serieElegida.show.rating.average}</div>
+          {/* <div
+            dangerouslySetInnerHTML={{ __html: serieElegida.show.summary }}
+          /> */}
+          <div>{parse(serieElegida.show.summary)}</div>
         </div>
       )}
     </div>
