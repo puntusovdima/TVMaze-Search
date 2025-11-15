@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import parse from "html-react-parser";
 import { PiFunctionDuotone } from "react-icons/pi";
 
@@ -20,16 +20,26 @@ async function searchQuery(query) {
 }
 
 function BusquedaSimple() {
+  const isInitialMount = useRef(true);
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
   const [seriesFavoritas, setSeriesFavoritas] = useState([]);
 
   const [serieElegida, setSerieElegida] = useState(null);
   useEffect(() => {
-    setSeriesFavoritas(JSON.parse(localStorage.getItem('misSeriesFavoritas')) || [])
+    setSeriesFavoritas(
+      JSON.parse(localStorage.getItem("misSeriesFavoritas")) || []
+    );
   }, []);
   useEffect(() => {
-    localStorage.setItem("misSeriesFavoritas", JSON.stringify(seriesFavoritas))
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      localStorage.setItem(
+        "misSeriesFavoritas",
+        JSON.stringify(seriesFavoritas)
+      );
+    }
   }, [seriesFavoritas]);
 
   useEffect(() => {
@@ -42,11 +52,63 @@ function BusquedaSimple() {
     setTerminoBusqueda(event.target.value);
   };
 
+  const guardarEnFavoritos = (serieParaGuardar) => {
+    const yaExiste = seriesFavoritas.some(
+      (fav) => fav.show.id === serieParaGuardar.show.id
+    );
+    if (!yaExiste) {
+      setSeriesFavoritas([...seriesFavoritas, serieParaGuardar]);
+    }
+  };
+
+  const quitarDeFavoritos = (event, serieParaQuitar) => {
+    // Detenemos el click para evitar que se abra el detalle (lo usaremos luego)
+    event.stopPropagation();
+
+    const nuevosFavoritos = seriesFavoritas.filter(
+      (fav) => fav.show.id !== serieParaQuitar.show.id
+    );
+    setSeriesFavoritas(nuevosFavoritos);
+  };
+
   return (
     <div className="busqueda-container">
       {serieElegida === null ? (
         <div>
           <h2>🔍 Encuentra tu serie favorita</h2>
+
+          {/* ====== SECCIÓN DE FAVORITOS ====== */}
+          <div className="favoritos-seccion" style={{ marginBottom: "30px" }}>
+            <h3>⭐ Mis Series Favoritas</h3>
+            {seriesFavoritas.length === 0 ? (
+              <p>No has guardado ninguna serie todavía.</p>
+            ) : (
+              <ul className="list-none grid grid-cols-5 gap-2">
+                {" "}
+                {/* Un grid de 5 columnas */}
+                {seriesFavoritas.map((fav) => (
+                  <li
+                    key={fav.show.id} // <-- Clave correcta
+                    onClick={() => setSerieElegida(fav)} // <-- Abre el detalle
+                    className="block border cursor-pointer relative" // <-- 'relative' para el botón
+                  >
+                    {/* Botón para quitar */}
+                    <button
+                      onClick={(e) => quitarDeFavoritos(e, fav)}
+                      className="absolute top-0 right-0 bg-red-600 text-white p-1"
+                      title="Quitar de favoritos"
+                    >
+                      X
+                    </button>
+
+                    {fav.show.image && <img src={fav.show.image.medium} />}
+                    <p className="p-2">{fav.show.name}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           {/* Input de Búsqueda */}
           <input
             type="text"
@@ -65,7 +127,7 @@ function BusquedaSimple() {
               {/* Mapea y muestra cada resultado */}
               {resultados.map((item) => (
                 <li
-                  key={item.id}
+                  key={item.show.id}
                   onClick={() => setSerieElegida(item)}
                   className="block border cursor-pointer"
                 >
@@ -80,17 +142,40 @@ function BusquedaSimple() {
         </div>
       ) : (
         <div>
-          <div className="flex bg-gray-100 p-4 justify-center gap-4">
-            <button
-              onClick={() => {
-                setSerieElegida(null);
-              }}
-            >
-              X
-            </button>
-            <h2>{serieElegida.show.name}</h2>
-            <button onClick={() => setSeriesFavoritas([...seriesFavoritas, serieElegida])}>Save</button>
-          </div>
+          {(() => {
+            const yaEsFavorita = seriesFavoritas.some(
+              (fav) => fav.show.id === serieElegida.show.id
+            );
+
+            return (
+              <div className="flex bg-gray-100 p-4 justify-center gap-4">
+                <button
+                  onClick={() => {
+                    setSerieElegida(null);
+                  }}
+                >
+                  X
+                </button>
+                {yaEsFavorita ? (
+                  <button
+                    onClick={(e) => quitarDeFavoritos(e, serieElegida)}
+                    className="bg-red-500 text-white p-2"
+                  >
+                    Quitar de Favoritos
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => guardarEnFavoritos(serieElegida)}
+                    className="bg-blue-500 text-white p-2"
+                  >
+                    Guardar en Favoritos
+                  </button>
+                )}
+              </div>
+            );
+          })()}
+
+          <h2>{serieElegida.show.name}</h2>
           {serieElegida.show.image && (
             <img src={serieElegida.show.image.medium} alt="Title image" />
           )}
@@ -101,7 +186,7 @@ function BusquedaSimple() {
             <strong>Estado:</strong> {serieElegida.show.status}
           </div>
           <div>
-            <strong>Tiempo promedio:</strong>{" "}
+            <strong>Duracion promedia:</strong>{" "}
             {serieElegida.show.averageRuntime || "N/A"}
           </div>
           <div>
