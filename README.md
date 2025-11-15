@@ -64,6 +64,9 @@ If you encounter issues while running the project, check the console for error m
 
 <br>
 <br>
+<p align="left">
+<a href="https://tvmaze-search-app-two.vercel.app/">Project on vercel</a>
+</p>
 <p align="right">
 <img src="https://gitfull.vercel.app/appLogo.png" width="20"/>  <a href="https://gitfull.vercel.app">Made by GitFull</a>
 </p>
