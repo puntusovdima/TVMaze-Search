@@ -11,6 +11,15 @@ async function searchQuery(query) {
   return data;
 }
 
+async function getShowDetails(id) {
+  const result = await fetch(`https://api.tvmaze.com/shows/${id}`);
+  if (!result.ok) {
+    throw new Error(`Error en la solicitud: ${result.statusText}`);
+  }
+  const data = await result.json();
+  return data;
+}
+
 function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -35,6 +44,8 @@ function BusquedaSimple() {
   const terminoDebounced = useDebounce(terminoBusqueda, 400);
 
   const [serieElegida, setSerieElegida] = useState(null);
+  const [detalleSerie, setDetalleSerie] = useState(null);
+  const [isLoadingDetalle, setIsLoadingDetalle] = useState(false);
   useEffect(() => {
     setSeriesFavoritas(
       JSON.parse(localStorage.getItem("misSeriesFavoritas")) || []
@@ -58,6 +69,26 @@ function BusquedaSimple() {
       });
     }
   }, [terminoDebounced]);
+
+  useEffect(() => {
+    // Si hay una serie elegida, buscamos sus detalles completos
+    if (serieElegida) {
+      setIsLoadingDetalle(true);
+      setDetalleSerie(null); // Limpiamos detalles anteriores
+
+      getShowDetails(serieElegida.show.id)
+        .then((data) => {
+          setDetalleSerie(data); // Guardamos los nuevos detalles completos
+        })
+        .catch((error) => {
+          console.error("Error al cargar detalles:", error);
+          // Aquí podrías setear un estado de error para mostrarlo
+        })
+        .finally(() => {
+          setIsLoadingDetalle(false);
+        });
+    }
+  }, [serieElegida]);
 
   const manejarCambio = (event) => {
     setTerminoBusqueda(event.target.value);
@@ -165,6 +196,7 @@ function BusquedaSimple() {
                 <button
                   onClick={() => {
                     setSerieElegida(null);
+                    setDetalleSerie(null);
                   }}
                   className="btn-detalle btn-cerrar-detalle"
                   title="Cerrar vista de detalle"
@@ -190,55 +222,61 @@ function BusquedaSimple() {
             );
           })()}
 
-          {/* Contenido del detalle estructurado para layout responsivo */}
-          <div className="detalle-contenido">
-            <div className="detalle-col-izquierda">
-              {serieElegida.show.image && (
-                <img
-                  src={serieElegida.show.image.original}
-                  alt={serieElegida.show.name}
-                />
-              )}
-            </div>
+          {isLoadingDetalle && (
+            <p className="estado-vacio">Cargando detalles...</p>
+          )}
 
-            <div className="detalle-col-derecha">
-              <h2>{serieElegida.show.name}</h2>
-              <div className="detalle-info">
-                <div>
-                  <strong>Genero:</strong>{" "}
-                  {serieElegida.show.genres.join(", ") || "N/A"}
-                </div>
-                <div>
-                  <strong>Estado:</strong> {serieElegida.show.status || "N/A"}
-                </div>
-                <div>
-                  <strong>Duracion promedia:</strong>{" "}
-                  {serieElegida.show.averageRuntime
-                    ? `${serieElegida.show.averageRuntime} min`
-                    : "N/A"}
-                </div>
-                <div>
-                  <strong>Estrenado:</strong>{" "}
-                  {serieElegida.show.premiered || "N/A"}
-                </div>
-                <div>
-                  <strong>Termino:</strong> {serieElegida.show.ended || "N/A"}
-                </div>
-                <div>
-                  <strong>Rating:</strong>{" "}
-                  {serieElegida.show.rating?.average || "N/A"}
-                </div>
+          {/* Contenido del detalle estructurado para layout responsivo */}
+          {!isLoadingDetalle && detalleSerie && (
+            <div className="detalle-contenido">
+              <div className="detalle-col-izquierda">
+                {detalleSerie.image && (
+                  <img
+                    src={detalleSerie.image.original}
+                    alt={detalleSerie.name}
+                  />
+                )}
               </div>
 
-              {serieElegida.show.summary ? (
-                <div className="detalle-summary">
-                  {parse(serieElegida.show.summary)}
+              <div className="detalle-col-derecha">
+                <h2>{detalleSerie.name}</h2>
+                <div className="detalle-info">
+                  <div>
+                    <strong>Genero:</strong>{" "}
+                    {detalleSerie.genres.join(", ") || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Estado:</strong> {detalleSerie.status || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Duracion promedia:</strong>{" "}
+                    {detalleSerie.averageRuntime
+                      ? `${detalleSerie.averageRuntime} min`
+                      : "N/A"}
+                  </div>
+                  <div>
+                    <strong>Estrenado:</strong>{" "}
+                    {detalleSerie.premiered || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Termino:</strong> {detalleSerie.ended || "N/A"}
+                  </div>
+                  <div>
+                    <strong>Rating:</strong>{" "}
+                    {detalleSerie.rating?.average || "N/A"}
+                  </div>
                 </div>
-              ) : (
-                <p>No hay resumen disponible</p>
-              )}
+
+                {detalleSerie.summary ? (
+                  <div className="detalle-summary">
+                    {parse(detalleSerie.summary)}
+                  </div>
+                ) : (
+                  <p>No hay resumen disponible</p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

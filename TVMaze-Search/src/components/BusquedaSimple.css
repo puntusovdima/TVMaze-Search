@@ -107,8 +107,6 @@ p.estado-vacio {
 }
 
 .serie-card img {
-  display: block; /* Ensures it behaves correctly in the flex container */
-  width: 100%;
   /* Forzamos una relación de aspecto (210x295 es el estándar de TVMaze "medium") */
   aspect-ratio: 210 / 295;
   /* Evita que la imagen se estire o se aplaste */
@@ -168,11 +166,11 @@ p.estado-vacio {
 .vista-detalle {
   width: 100%;
   height: 100%;
-  padding: 1em;
   background-color: #1a1a1a; /* Fondo oscuro ligeramente diferente */
   z-index: 1000;
   overflow-y: auto; /* Permite scroll SÓLO en el modal */
   animation: fadeIn 0.4s ease-in-out;
+  min-width: 70vw;
 }
 
 @keyframes fadeIn {
@@ -265,7 +263,8 @@ p.estado-vacio {
 }
 
 .detalle-summary {
-  margin-top: 1.5rem;
+  padding: 0 1rem;
+  margin-top: 1.5rem ;
   line-height: 1.6;
   color: #ccc;
 }
