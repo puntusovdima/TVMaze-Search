@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import parse from 'html-react-parser';
+import parse from "html-react-parser";
+import { PiFunctionDuotone } from "react-icons/pi";
 
 // const datosEjemplo = [
 //   { id: 1, titulo: "Introducción a React" },
@@ -21,8 +22,15 @@ async function searchQuery(query) {
 function BusquedaSimple() {
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
+  const [seriesFavoritas, setSeriesFavoritas] = useState([]);
 
   const [serieElegida, setSerieElegida] = useState(null);
+  useEffect(() => {
+    setSeriesFavoritas(JSON.parse(localStorage.getItem('misSeriesFavoritas')) || [])
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("misSeriesFavoritas", JSON.stringify(seriesFavoritas))
+  }, [seriesFavoritas]);
 
   useEffect(() => {
     searchQuery(terminoBusqueda).then((data) => {
@@ -38,7 +46,7 @@ function BusquedaSimple() {
     <div className="busqueda-container">
       {serieElegida === null ? (
         <div>
-          <h2>🔍 Página de Búsqueda Simple</h2>
+          <h2>🔍 Encuentra tu serie favorita</h2>
           {/* Input de Búsqueda */}
           <input
             type="text"
@@ -53,16 +61,18 @@ function BusquedaSimple() {
           {resultados.length === 0 ? (
             <p>No se encontraron resultados para "{terminoBusqueda}".</p>
           ) : (
-            <ul>
+            <ul className="list-none grid grid-cols-3">
               {/* Mapea y muestra cada resultado */}
               {resultados.map((item) => (
                 <li
                   key={item.id}
-                  style={{ marginBottom: "5px" }}
                   onClick={() => setSerieElegida(item)}
+                  className="block border cursor-pointer"
                 >
-                  {item.show.name}
-                  <img src={item.show.image.medium} />
+                  <p>
+                    {item.show.image && <img src={item.show.image.medium} />}
+                  </p>
+                  <p>{item.show.name}</p>
                 </li>
               ))}
             </ul>
@@ -70,34 +80,48 @@ function BusquedaSimple() {
         </div>
       ) : (
         <div>
-          <button
-            onClick={() => {
-              setSerieElegida(null);
-            }}
-          >
-            X
-          </button>
-          <h2>{serieElegida.show.name}</h2>
-          <div>
-            Genero:{" "}
-            {
-              // <>
-              // {serieElegida.show.genres.map((genero) => (
-              //   <p>, {genero}</p>
-              // ))}
-              // </>
-              serieElegida.show.genres.join(", ")
-            }
+          <div className="flex bg-gray-100 p-4 justify-center gap-4">
+            <button
+              onClick={() => {
+                setSerieElegida(null);
+              }}
+            >
+              X
+            </button>
+            <h2>{serieElegida.show.name}</h2>
+            <button onClick={() => setSeriesFavoritas([...seriesFavoritas, serieElegida])}>Save</button>
           </div>
-          <div>Estado: {serieElegida.show.status}</div>
-          <div>Tiempo promedio: {serieElegida.show.averageRuntime}</div>
-          <div>Estrenado: {serieElegida.show.premiered}</div>
-          <div>Termino: {serieElegida.show.ended}</div>
-          <div>Rating: {serieElegida.show.rating.average}</div>
+          {serieElegida.show.image && (
+            <img src={serieElegida.show.image.medium} alt="Title image" />
+          )}
+          <div>
+            <strong>Genero:</strong> {serieElegida.show.genres.join(", ")}
+          </div>
+          <div>
+            <strong>Estado:</strong> {serieElegida.show.status}
+          </div>
+          <div>
+            <strong>Tiempo promedio:</strong>{" "}
+            {serieElegida.show.averageRuntime || "N/A"}
+          </div>
+          <div>
+            <strong>Estrenado:</strong> {serieElegida.show.premiered || "N/A"}
+          </div>
+          <div>
+            <strong>Termino:</strong> {serieElegida.show.ended || "N/A"}
+          </div>
+          <div>
+            <strong>Rating:</strong>{" "}
+            {serieElegida.show.rating?.average || "N/A"}
+          </div>
           {/* <div
             dangerouslySetInnerHTML={{ __html: serieElegida.show.summary }}
           /> */}
-          <div>{parse(serieElegida.show.summary)}</div>
+          {serieElegida.show.summary ? (
+            <div>{parse(serieElegida.show.summary)}</div>
+          ) : (
+            <p>No hay resumen disponible</p>
+          )}
         </div>
       )}
     </div>
