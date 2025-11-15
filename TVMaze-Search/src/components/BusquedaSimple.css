@@ -242,7 +242,8 @@ p.estado-vacio {
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
   display: block;
-  margin: 0 auto;
+  margin: 1em;
+  aspect-ratio: 210 / 295;
 }
 
 .detalle-col-derecha h2 {
@@ -264,7 +265,7 @@ p.estado-vacio {
 
 .detalle-summary {
   padding: 0 1rem;
-  margin-top: 1.5rem ;
+  margin-top: 1.5rem;
   line-height: 1.6;
   color: #ccc;
 }
@@ -313,10 +314,6 @@ p.estado-vacio {
   .detalle-col-izquierda {
     flex-shrink: 0;
     width: 300px;
-  }
-  .detalle-col-izquierda img {
-    aspect-ratio: 210 / 295;
-    margin: 0;
   }
   .detalle-col-derecha {
     flex-grow: 1;
