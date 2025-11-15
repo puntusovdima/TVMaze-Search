@@ -22,17 +22,19 @@ body.modal-abierto {
 h2,
 h3 {
   color: #ffffff;
-  border-bottom: 2px solid #333;
   padding-bottom: 8px;
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
 
 h2 {
-  font-size: 1.8rem;
+  font-size: 2rem;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
 }
 h3 {
   font-size: 1.4rem;
+  border-bottom: 2px solid #333;
 }
 
 p.estado-vacio {
@@ -100,8 +102,19 @@ p.estado-vacio {
 
 .serie-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
   border-color: #444;
+}
+
+.serie-card img {
+  display: block; /* Ensures it behaves correctly in the flex container */
+  width: 100%;
+  /* Forzamos una relación de aspecto (210x295 es el estándar de TVMaze "medium") */
+  aspect-ratio: 210 / 295;
+  /* Evita que la imagen se estire o se aplaste */
+  object-fit: cover;
+  /* Un color de fondo por si alguna imagen falta */
+  background-color: #1a1a1a;
 }
 
 .serie-card p {
@@ -303,6 +316,7 @@ p.estado-vacio {
     width: 300px;
   }
   .detalle-col-izquierda img {
+    aspect-ratio: 210 / 295;
     margin: 0;
   }
   .detalle-col-derecha {
@@ -312,11 +326,10 @@ p.estado-vacio {
 
 /* Escritorio con pantalla grande */
 @media (min-width: 1300px) {
-    .favoritos-grid {
-        grid-template-columns: repeat(8, 1fr);
-    }
-    .resultados-grid{
-        grid-template-columns: repeat(5, 1fr);
-    }
-    
+  .favoritos-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+  .resultados-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
