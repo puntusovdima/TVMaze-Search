@@ -21,6 +21,8 @@ function BusquedaSimple() {
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
 
+  const [serieElegida, setSerieElegida] = useState(null);
+
   useEffect(() => {
     searchQuery(terminoBusqueda).then((data) => {
       setResultados(data);
@@ -33,30 +35,57 @@ function BusquedaSimple() {
 
   return (
     <div className="busqueda-container">
-      <h2>🔍 Página de Búsqueda Simple</h2>
 
-      {/* Input de Búsqueda */}
-      <input
-        type="text"
-        placeholder="Escribe tu término de búsqueda..."
-        value={terminoBusqueda}
-        onChange={manejarCambio} // Llama a la función al escribir
-        style={{ padding: "10px", width: "300px", marginBottom: "20px" }}
-      />
+      {serieElegida === null ? (
+        <div>
+          <h2>🔍 Página de Búsqueda Simple</h2>
+          {/* Input de Búsqueda */}
+          <input
+            type="text"
+            placeholder="Escribe tu término de búsqueda..."
+            value={terminoBusqueda}
+            onChange={manejarCambio} // Llama a la función al escribir
+            style={{ padding: "10px", width: "300px", marginBottom: "20px" }}
+          />
 
-      {/* Resultados */}
-      <h3>Resultados: ({resultados.length})</h3>
-      {resultados.length === 0 ? (
-        <p>No se encontraron resultados para "{terminoBusqueda}".</p>
+          {/* Resultados */}
+          <h3>Resultados: ({resultados.length})</h3>
+          {resultados.length === 0 ? (
+            <p>No se encontraron resultados para "{terminoBusqueda}".</p>
+          ) : (
+            <ul>
+              {/* Mapea y muestra cada resultado */}
+              {resultados.map((item) => (
+                <li
+                  key={item.id}
+                  style={{ marginBottom: "5px" }}
+                  onClick={() => setSerieElegida(item)}
+                >
+                  {item.show.name}
+                  <img src={item.show.image.medium} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : (
-        <ul>
-          {/* Mapea y muestra cada resultado */}
-          {resultados.map((item) => (
-            <li key={item.id} style={{ marginBottom: "5px" }}>
-              {item.show.name}
-            </li>
-          ))}
-        </ul>
+        <div>
+          <h2>{serieElegida.show.name}</h2>
+          <div>Genero: {
+            <>
+            {serieElegida.show.genres.map((genero) => (
+              <p>, {genero}</p>
+            ))}
+            </>
+            }
+            </div>
+            <div>Estado: {serieElegida.show.status}</div>
+            <div>Tiempo promedio: {serieElegida.show.averageRuntime}</div>
+            <div>Estrenado: {serieElegida.show.premiered}</div>
+            <div>Termino: {serieElegida.show.ended}</div>
+            <div>Rating: {serieElegida.show.rating.average}</div>
+            {serieElegida.show.summary}
+        </div>
       )}
     </div>
   );
