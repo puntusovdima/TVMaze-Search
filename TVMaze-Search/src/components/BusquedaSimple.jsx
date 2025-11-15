@@ -46,6 +46,7 @@ function BusquedaSimple() {
   const [serieElegida, setSerieElegida] = useState(null);
   const [detalleSerie, setDetalleSerie] = useState(null);
   const [isLoadingDetalle, setIsLoadingDetalle] = useState(false);
+  const [showFavoritas, setShowFavoritas] = useState(false);
   useEffect(() => {
     setSeriesFavoritas(
       JSON.parse(localStorage.getItem("misSeriesFavoritas")) || []
@@ -94,6 +95,10 @@ function BusquedaSimple() {
     setTerminoBusqueda(event.target.value);
   };
 
+  const manejarCambioShowFavs = (event) => {
+    setShowFavoritas(event.target.checked);
+  };
+
   const guardarEnFavoritos = (serieParaGuardar) => {
     const yaExiste = seriesFavoritas.some(
       (fav) => fav.show.id === serieParaGuardar.show.id
@@ -119,38 +124,49 @@ function BusquedaSimple() {
           <h2>🔍 Encuentra tu serie favorita</h2>
 
           {/* ====== SECCIÓN DE FAVORITOS ====== */}
-          <div className="favoritos-seccion">
-            <h3>⭐ Mis Series Favoritas</h3>
-            {seriesFavoritas.length === 0 ? (
-              <p className="estado-vacio">
-                No has guardado ninguna serie todavía.
-              </p>
-            ) : (
-              <ul className="lista-series favoritos-grid">
-                {seriesFavoritas.map((fav) => (
-                  <li
-                    key={fav.show.id}
-                    onClick={() => setSerieElegida(fav)}
-                    className="serie-card favorito-card"
-                  >
-                    {/* Botón para quitar */}
-                    <button
-                      onClick={(e) => quitarDeFavoritos(e, fav)}
-                      className="btn-quitar-fav"
-                      title="Quitar de favoritos"
+          <h3>
+            ⭐ Mis Series Favoritas
+            <input
+              type="checkbox"
+              checked={showFavoritas}
+              name="showFavs"
+              id="showFavsCheckbox"
+              onChange={manejarCambioShowFavs}
+            />
+          </h3>
+          {showFavoritas && (
+            <div className="favoritos-seccion">
+              {seriesFavoritas.length === 0 && showFavoritas ? (
+                <p className="estado-vacio">
+                  No has guardado ninguna serie todavía.
+                </p>
+              ) : (
+                <ul className="lista-series favoritos-grid">
+                  {seriesFavoritas.map((fav) => (
+                    <li
+                      key={fav.show.id}
+                      onClick={() => setSerieElegida(fav)}
+                      className="serie-card favorito-card"
                     >
-                      &times; {/* Un 'X' más elegante */}
-                    </button>
+                      {/* Botón para quitar */}
+                      <button
+                        onClick={(e) => quitarDeFavoritos(e, fav)}
+                        className="btn-quitar-fav"
+                        title="Quitar de favoritos"
+                      >
+                        &times; {/* Un 'X' más elegante */}
+                      </button>
 
-                    {fav.show.image && (
-                      <img src={fav.show.image.medium} alt={fav.show.name} />
-                    )}
-                    <p>{fav.show.name}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+                      {fav.show.image && (
+                        <img src={fav.show.image.medium} alt={fav.show.name} />
+                      )}
+                      <p>{fav.show.name}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Input de Búsqueda */}
           <input
