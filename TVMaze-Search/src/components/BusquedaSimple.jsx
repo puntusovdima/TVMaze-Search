@@ -1,14 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import parse from "html-react-parser";
-import { PiFunctionDuotone } from "react-icons/pi";
 
-// const datosEjemplo = [
-//   { id: 1, titulo: "Introducción a React" },
-//   { id: 2, titulo: "Guía de Hooks de React" },
-//   { id: 3, titulo: "Componentes con Vite" },
-//   { id: 4, titulo: "Desarrollo Front-end" },
-//   { id: 5, titulo: "Conceptos Básicos de JavaScript" },
-// ];
 
 async function searchQuery(query) {
   const result = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`);
@@ -19,11 +11,28 @@ async function searchQuery(query) {
   return data;
 }
 
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 function BusquedaSimple() {
   const isInitialMount = useRef(true);
   const [terminoBusqueda, setTerminoBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
   const [seriesFavoritas, setSeriesFavoritas] = useState([]);
+  const terminoDebounced = useDebounce(terminoBusqueda, 400);
 
   const [serieElegida, setSerieElegida] = useState(null);
   useEffect(() => {
@@ -43,10 +52,13 @@ function BusquedaSimple() {
   }, [seriesFavoritas]);
 
   useEffect(() => {
-    searchQuery(terminoBusqueda).then((data) => {
-      setResultados(data);
-    });
-  }, [terminoBusqueda]);
+    if (terminoDebounced) {
+      searchQuery(terminoDebounced).then((data) => {
+        // <-- ¡Usa 'terminoDebounced'!
+        setResultados(data);
+      });
+    }
+  }, [terminoDebounced]);
 
   const manejarCambio = (event) => {
     setTerminoBusqueda(event.target.value);
