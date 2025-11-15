@@ -62,12 +62,7 @@ If you encounter issues while running the project, check the console for error m
 
 
 
-<br><br>
-<div align="center">
-<img src="https://avatars.githubusercontent.com/u/59811825?v=4" width="120" />
-<h3>null</h3>
-<p>No information provided.</p>
-</div>
+<br>
 <br>
 <p align="right">
 <img src="https://gitfull.vercel.app/appLogo.png" width="20"/>  <a href="https://gitfull.vercel.app">Made by GitFull</a>
